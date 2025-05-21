@@ -25,9 +25,15 @@ Input Forge aims to provide a flexible and robust input management solution with
 
 The following features and improvements are planned to enhance Input Forge:
 
-- **Improved Fake Joysticks**: Enhance keyboard-based joystick emulation to be more intuitive and responsive, improving the experience for keyboard users.
+**Usability Enhancements**:
+
+- **Improved Fake Joysticks**: Enhance keyboard-based joystick emulation to be more intuitive and responsive, improving the experience for users mapping any set of keys (e.g., WASD) to joystick-like controls.
 - **Simplified Input Maps**: Streamline the input mapping process to reduce complexity and improve developer usability.
-- **Robust Input Map Stack**: Add safeguards to prevent synchronization issues in the input map stack, such as handling incorrect pop operations.
+- **Game Controller Detection**: Implement detection of game controller types (e.g., Xbox, PlayStation) to enable platform-specific UI graphics, such as displaying the correct button icons for in-game actions.
+
+**Stability Improvements**:
+
+- **Robust Input Map Stack**: Add safeguards to prevent synchronization issues in the `input map stack`, such as handling incorrect `pop` operations.
 - **Circular Dependency Resolution**: Develop a cleaner solution for circular dependencies between input maps and commands, eliminating the need for workarounds.
 
 ---
