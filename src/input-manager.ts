@@ -15,6 +15,8 @@ export class InputManager {
     private _disconnect$ = new Subject<void>();
     private _inputSource: InputSource;
 
+    private _commandCache = new Map<string, Command[]>();
+
     constructor(fps: number = 12, deadzone: number = 0.1) {
         this._inputSource = new InputSource(fps, deadzone);
 
@@ -109,26 +111,43 @@ export class InputManager {
             });
     }
 
+    private invalidateCommandCache(): void {
+        this._commandCache.clear();
+    }
+
     public pushInputMap(inputMap: InputMap): void {
         this._inputMapStack.push(inputMap);
+        this.invalidateCommandCache();
     }
 
     public setInputMap(inputMap: InputMap): void {
         this._inputMapStack = [inputMap];
+        this.invalidateCommandCache();
     }
 
     public popInputMap(): void {
         this._inputMapStack.pop();
+        this.invalidateCommandCache();
     }
 
     private getCommands(key: string): Command[] {
         const inputMap = this._inputMapStack.at(-1);
-        return Object.values(inputMap!.singleInput)
+        if (!inputMap?.singleInput) return [];
+
+        if (this._commandCache.has(key)) {
+            return this._commandCache.get(key)!;
+        }
+
+
+        const commands = Object.values(inputMap!.singleInput)
             .filter(
                 (entry: SingleInputEntry) =>
                     entry.keyboardInput === key || entry.controllerInput === key
             )
             .map((entry: SingleInputEntry) => entry.command);
+
+        this._commandCache.set(key, commands);
+        return commands;
     }
 
     private getAxesCommands(name: string): AxesCommand[] {
@@ -184,5 +203,13 @@ export class InputManager {
                     axis: axis,
                 };
             });
+    }
+
+    public destroy(): void {
+        this._disconnect$.next();
+        this._disconnect$.complete();
+        this._inputSource.destroy();
+        this._commandCache.clear();
+        this._inputMapStack = [];
     }
 }

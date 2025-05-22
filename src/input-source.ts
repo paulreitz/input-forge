@@ -222,4 +222,9 @@ export class InputSource {
                 }
             });
     }
+
+    public destroy() {
+        this.disconnect$.next();
+        this.disconnect$.complete();
+    }
 }
