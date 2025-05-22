@@ -1,6 +1,6 @@
 # Input Forge
 
-Input Forge is a platform-agnostic input management library designed to seamlessly normalize inputs from keyboards and game controllers. For games built with Phaser, Three.js, or another framework, Input Forge simplifies input handling by supporting multiple input sources, customizable controls, and a unified API for event-driven and polled inputs.
+Input Forge is a platform-agnostic input management library designed to seamlessly normalize inputs from keyboards and game controllers. For games built with Phaser, Three.js, or other frameworks, Input Forge simplifies input handling by supporting multiple input sources, customizable controls, and a unified API for event-driven and polled inputs.
 
 > **NOTICE:**
 >
