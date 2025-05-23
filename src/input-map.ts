@@ -1,8 +1,9 @@
 import { Command, AxesCommand } from './command';
 
 export type SingleInputEntry = {
-    keyboardInput: string;
-    controllerInput: string;
+    keyboardInput?: string;
+    controllerInput?: string;
+    systemInput?: string;
     command: Command;
 };
 

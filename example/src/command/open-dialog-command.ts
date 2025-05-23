@@ -13,7 +13,7 @@ export class OpenDialogCommand extends Command {
         this.dialogInputMap = inputMap;
     }
 
-    execute() {
+    trigger() {
         this.setShowDialog(true);
         if (this.dialogInputMap) {
             inputManager.pushInputMap(this.dialogInputMap);

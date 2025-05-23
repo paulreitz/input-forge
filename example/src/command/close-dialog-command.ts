@@ -7,7 +7,7 @@ export class CloseDialogCommand extends Command {
         super();
     }
 
-    execute() {
+    trigger() {
         this.setShowDialog(false);
         inputManager.popInputMap();
     }

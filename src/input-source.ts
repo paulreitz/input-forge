@@ -15,9 +15,13 @@ export class InputSource {
     private _axesInputUpdate$ = new Subject<{ name: string; axes: AxesInput }>();
     private _axesInputRelease$ = new Subject<{ name: string; axes: AxesInput }>();
 
+    private _tick$ = new Subject<number>();
+
     private _fps: number;
     private _deadzone: number;
     private _isWorking: boolean = false;
+    private _useTick: boolean = false;
+    private _lastTickTime: number = 0;
 
     private keyPress: string[] = [];
     private keyRelease: string[] = [];
@@ -39,6 +43,8 @@ export class InputSource {
     public axesInputTrigger$ = this._axesInputTrigger$.asObservable();
     public axesInputUpdate$ = this._axesInputUpdate$.asObservable();
     public axesInputRelease$ = this._axesInputRelease$.asObservable();
+
+    public tick$ = this._tick$.asObservable();
 
     constructor(fps: number = 12, deadzone: number = 0.1) {
         this._fps = fps;
@@ -96,6 +102,11 @@ export class InputSource {
         );
 
         this.startGameLoop();
+    }
+
+    public startTick() {
+        this._useTick = true;
+        this._lastTickTime = performance.now();
     }
 
     private keyboardTriggers() {
@@ -204,6 +215,15 @@ export class InputSource {
         }
     }
 
+    private tick() {
+        if (this._useTick) {
+            const now = performance.now();
+            const delta = now - this._lastTickTime;
+            this._lastTickTime = now;
+            this._tick$.next(delta);
+        }
+    }
+
     private startGameLoop() {
         interval(1000 / this._fps)
             .pipe(takeUntil(this.disconnect$))
@@ -218,6 +238,8 @@ export class InputSource {
                     this.gamepadAxesUpdate();
                     this.gamepadButtonTriggers();
                     this.gamepadAxesTriggers();
+
+                    this.tick();
                     this._isWorking = false;
                 }
             });

@@ -1,13 +1,14 @@
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { InputSource } from "./input-source";
-import { Command, AxesCommand } from "./command";
+import { Command, AxesCommand, TickCommand } from "./command";
 import {
     InputMap,
     AxesInput,
     SingleInputEntry,
     AxesInputEntry,
 } from "./input-map";
+import { Inputs } from "./input-utils";
 
 export class InputManager {
     private _inputMapStack: InputMap[] = [];
@@ -26,14 +27,14 @@ export class InputManager {
                 if (!!this._inputMapStack.length) {
                     const commands = this.getCommands(key);
                     commands.forEach((command: Command) => {
-                        command.execute();
+                        command.trigger();
                     });
 
                     const axesCommands = this.getAxesByKey(key);
                     axesCommands.forEach(
                         (entry: { command: AxesCommand; axis: [number, number] }) => {
                             const command = entry.command;
-                            command.execute(entry.axis);
+                            command.trigger(entry.axis);
                         }
                     );
                 }
@@ -83,7 +84,7 @@ export class InputManager {
                 if (!!this._inputMapStack.length) {
                     const commands = this.getAxesCommands(data.name);
                     commands.forEach((command: AxesCommand) => {
-                        command.execute(data.axes);
+                        command.trigger(data.axes);
                     });
                 }
             });
@@ -106,6 +107,17 @@ export class InputManager {
                     const commands = this.getAxesCommands(data.name);
                     commands.forEach((command: AxesCommand) => {
                         command.release();
+                    });
+                }
+            });
+
+        this._inputSource.tick$
+            .pipe(takeUntil(this._disconnect$))
+            .subscribe((delta: number) => {
+                if (!!this._inputMapStack.length) {
+                    const commands = this.getTickCommands();
+                    commands.forEach((command: TickCommand) => {
+                        command.tick(delta);
                     });
                 }
             });
@@ -203,6 +215,22 @@ export class InputManager {
                     axis: axis,
                 };
             });
+    }
+
+    private getTickCommands(): TickCommand[] {
+        const inputMap = this._inputMapStack.at(-1);
+        if (!inputMap?.singleInput) return [];
+
+        if (this._commandCache.has(Inputs.SYSTEM_TICK)) {
+            return this._commandCache.get(Inputs.SYSTEM_TICK)! as TickCommand[];
+        }
+
+        const commands = Object.values(inputMap!.singleInput)
+            .filter((entry: SingleInputEntry) => entry.systemInput === Inputs.SYSTEM_TICK)
+            .map((entry: SingleInputEntry) => entry.command as TickCommand);
+
+        this._commandCache.set(Inputs.SYSTEM_TICK, commands);
+        return commands;
     }
 
     public destroy(): void {

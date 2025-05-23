@@ -6,7 +6,7 @@ export class ButtonCommand extends Command {
         super();
     }
 
-    execute() {
+    trigger() {
         this.setButtonState(true);
     }
 

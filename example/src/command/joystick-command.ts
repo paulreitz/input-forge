@@ -15,7 +15,7 @@ export class JoystickCommand extends AxesCommand {
         setDotY(height() / 2);
     }
 
-    execute(value: [number, number] | AxesInput) {
+    trigger(value: [number, number] | AxesInput) {
         let adjustedWidth = width() - 20;
         let adjustedHeight = height() - 20;
         if (Array.isArray(value)) {
